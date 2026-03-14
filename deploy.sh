@@ -19,6 +19,7 @@ git commit -m "Update $TIMESTAMP"
 
 # Zu GitHub pushen
 git push origin main
+# Repository: https://github.com/sbre1996/feelflowfade-upgrade.git
 
 echo ""
 echo "✅ Fertig! Die Website ist jetzt live."
