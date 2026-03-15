@@ -39,7 +39,7 @@
 
 /* ── Reset ──────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 body {
   font-family: var(--sans);
   font-size: 16px;
@@ -172,10 +172,10 @@ img { display: block; max-width: 100%; }
 .reveal-hero > *:nth-child(6) { animation-delay: .76s; }
 
 .reveal {
-  opacity: 0; transform: translateY(30px);
-  transition: opacity .75s ease, transform .75s ease;
+  opacity: 0; transform: translateY(30px); filter: blur(6px);
+  transition: opacity .85s ease, transform .85s ease, filter .85s ease;
 }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal.visible { opacity: 1; transform: translateY(0); filter: blur(0); }
 
 
 /* ═══════════════════════════════════════════════════════════
@@ -834,22 +834,44 @@ img { display: block; max-width: 100%; }
 @media (max-width: 600px) {
   /* Navigation */
   .nav-links {
-    display: none; flex-direction: column; gap: 0; align-items: center;
-    position: fixed; inset: 0; top: 68px;
-    background: rgba(30,60,70,.97);
+    display: flex; flex-direction: column; gap: 0; align-items: stretch;
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: min(300px, 85vw);
+    background: rgba(30,60,70,.98);
     backdrop-filter: blur(12px);
-    padding: var(--s6) var(--s4) var(--s5);
-    overflow-y: auto; z-index: 199;
+    padding: var(--s3) 0 var(--s5);
+    overflow-y: auto; z-index: 300;
+    transform: translateX(-100%);
+    transition: transform .3s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,.4);
   }
-  .nav-links.open { display: flex; }
+  .nav-links.open { transform: translateX(0); }
+  /* Overlay hinter dem Menü */
+  .nav-links.open::before {
+    content: '';
+    position: fixed; inset: 0; left: min(300px, 85vw);
+    background: rgba(0,0,0,.45);
+    z-index: -1;
+  }
+  /* X-Button */
+  .nav-close {
+    display: flex; align-items: center; justify-content: center;
+    align-self: flex-start;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-dark); font-size: 22px; line-height: 1;
+    padding: var(--s2) var(--s3);
+    margin-bottom: var(--s2);
+    transition: color .2s;
+  }
+  .nav-close:hover { color: var(--bronze-lt); }
   .nav-links li {
-    width: 100%; text-align: center;
+    width: 100%; text-align: left;
     border-bottom: 1px solid rgba(196,104,64,.2);
   }
-  .nav-links li:first-child { border-top: 1px solid rgba(196,104,64,.2); }
+  .nav-links li:first-of-type { border-top: 1px solid rgba(196,104,64,.2); }
   .nav-links a {
-    display: block; padding: 20px var(--s3);
-    font-family: var(--serif); font-size: 22px; font-weight: 500;
+    display: block; padding: 18px var(--s3);
+    font-family: var(--serif); font-size: 20px; font-weight: 500;
     letter-spacing: .04em; color: var(--text-dark);
     transition: color .2s;
   }
@@ -957,6 +979,118 @@ img { display: block; max-width: 100%; }
   .container-text { padding-inline: var(--s2); }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   DESIGN ENHANCEMENTS — Textur · Bewegung · Tiefe
+   ═══════════════════════════════════════════════════════════ */
+
+/* Grain-Textur über der gesamten Seite */
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .028; mix-blend-mode: overlay;
+}
+
+/* Textauswahl in Marken-Farben */
+::selection { background: var(--bronze); color: var(--ivory); }
+
+/* ── Hero: animierter Hintergrund ── */
+@keyframes heroPulse {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.06); opacity: .88; }
+}
+.hero-bg-layer { animation: heroPulse 16s ease-in-out infinite; }
+
+/* Hero: Titel-Glow */
+.hero-title { text-shadow: 0 2px 80px rgba(196,104,64,.15); }
+
+/* Hero: Scroll-Indikator */
+@keyframes scrollDrop {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  width: 1px; height: 56px;
+  background: linear-gradient(to bottom, rgba(196,104,64,.65), transparent);
+  animation: scrollDrop 2.8s ease-in-out infinite;
+}
+
+/* ── Navigation: animierter Unterstrich ── */
+@media (min-width: 601px) {
+  .nav-links a { position: relative; display: inline-block; }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0; right: 0; height: 1px;
+    background: var(--bronze); transform: scaleX(0); transform-origin: center;
+    transition: transform .3s ease;
+  }
+  .nav-links a:hover::after { transform: scaleX(1); }
+}
+
+/* ── Ornament: sanftes Schweben ── */
+@keyframes ornamentFloat {
+  0%, 100% { transform: translateY(0); opacity: .7; }
+  50%       { transform: translateY(-5px); opacity: 1; }
+}
+.ornament { animation: ornamentFloat 5s ease-in-out infinite; }
+.ornament--gold { animation-duration: 4s; }
+
+/* ── Offer Cards: mehr Tiefe ── */
+.offer-card {
+  box-shadow: 0 8px 40px rgba(0,0,0,.25), inset 0 1px 0 rgba(250,240,224,.06);
+}
+.offer-card--hero {
+  box-shadow: 0 20px 60px rgba(196,104,64,.2), inset 0 1px 0 rgba(250,240,224,.12);
+}
+
+/* ── Primär-Button: Shimmer ── */
+@keyframes btnShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+.btn-gold {
+  background: linear-gradient(120deg, var(--bronze) 0%, var(--bronze-lt) 48%, var(--bronze) 100%);
+  background-size: 220% 100%;
+  animation: btnShimmer 4s ease-in-out infinite;
+}
+.btn-gold:hover { animation-play-state: paused; }
+
+/* ── Newsletter: Glow-Puls ── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0   rgba(196,104,64,0); }
+  50%       { box-shadow: 0 0 90px rgba(196,104,64,.14); }
+}
+.newsletter-inner { animation: glowPulse 5s ease-in-out infinite; }
+
+/* ── Intro-Absätze: feiner Separator ── */
+.intro-statements p + p {
+  padding-top: 22px;
+  border-top: 1px solid rgba(196,104,64,.1);
+}
+
+/* ── Testimonial: größeres Anführungszeichen ── */
+.tcard-quote {
+  font-size: 160px;
+  opacity: .1;
+  margin-bottom: -48px;
+  line-height: .9;
+}
+
+/* ── Kurs-Karte: zusätzliche Atmosphäre ── */
+.course-card-visual {
+  box-shadow: 0 12px 48px rgba(0,0,0,.2);
+}
+
+/* ── Footer: Marken-Linie oben ── */
+.footer-top {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--bronze), transparent) 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal-hero > * { animation: none; opacity: 1; transform: none; transition: none; }
+  .reveal, .reveal-hero > * { animation: none; opacity: 1; transform: none; transition: none; filter: none; }
+  .hero-bg-layer, .ornament, .btn-gold, .newsletter-inner, body::after { animation: none; }
+  .hero::after { display: none; }
 }

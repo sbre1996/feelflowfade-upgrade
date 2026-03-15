@@ -11,27 +11,32 @@ window.addEventListener('scroll', () => {
 // ── Nav: mobile burger ──────────────────────────────────
 const burger = document.querySelector('.nav-burger');
 const navLinks = document.querySelector('.nav-links');
+const navClose = document.querySelector('.nav-close');
 
-burger.addEventListener('click', () => {
-  const open = navLinks.classList.toggle('open');
-  burger.setAttribute('aria-expanded', String(open));
-  document.body.style.overflow = open ? 'hidden' : '';
-  const [s0, s1, s2] = burger.querySelectorAll('span');
-  if (open) {
-    s0.style.transform = 'translateY(6px) rotate(45deg)';
-    s1.style.opacity   = '0';
-    s2.style.transform = 'translateY(-6px) rotate(-45deg)';
-  } else {
-    [s0, s1, s2].forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
-  }
-});
-
-navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+function closeMenu() {
   navLinks.classList.remove('open');
   burger.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
-  burger.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
-}));
+}
+
+function openMenu() {
+  navLinks.classList.add('open');
+  burger.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+}
+
+burger.addEventListener('click', () => {
+  if (navLinks.classList.contains('open')) { closeMenu(); } else { openMenu(); }
+});
+
+navClose.addEventListener('click', closeMenu);
+
+navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+
+// Schließen beim Klick auf das Overlay (rechts vom Menü)
+navLinks.addEventListener('click', (e) => {
+  if (e.target === navLinks) closeMenu();
+});
 
 // ── Scroll reveal ───────────────────────────────────────
 const io = new IntersectionObserver((entries) => {
