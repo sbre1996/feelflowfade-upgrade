@@ -29,7 +29,7 @@ burger.addEventListener('click', () => {
   if (navLinks.classList.contains('open')) { closeMenu(); } else { openMenu(); }
 });
 
-navClose.addEventListener('click', closeMenu);
+if (navClose) navClose.addEventListener('click', closeMenu);
 
 navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
 
